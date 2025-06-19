@@ -1,0 +1,28 @@
+name: Ejecutar colección Postman
+
+on:
+  schedule:
+    - cron: '0 8 * * *'    # se ejecuta cada día a las 08:00 UTC
+  workflow_dispatch:       # permite dispararlo manualmente
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Instalar Newman
+        run: npm install -g newman
+
+      - name: Ejecutar colección y exportar CSV
+        run: |
+          newman run Generar Tokens.postman_collection.json \
+            -e YPF-LW PROD.postman_environment.json \
+            --export-csv resultados.csv
+
+      - name: Subir resultados como artefacto
+        uses: actions/upload-artifact@v3
+        with:
+          name: resultados-postman
+          path: resultados.csv
