@@ -18,8 +18,8 @@ jobs:
 
       - name: Ejecutar colección y exportar CSV
         run: |
-          newman run Generar Tokens.postman_collection.json \
-            -e YPF-LW PROD.postman_environment.json \
+          newman run "Generar Tokens.postman_collection.json" \
+            -e "YPF-LW PROD.postman_environment.json" \
             -r cli,csv \
             --reporter-csv-export resultados.csv
 
