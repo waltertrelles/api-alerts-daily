@@ -2,7 +2,7 @@ name: Ejecutar colección Postman
 
 on:
   schedule:
-    - cron:  '0 8 * * *'    # Todos los días a las 08:00 UTC
+    - cron: '0 8 * * *'     # Todos los días a las 08:00 UTC
   workflow_dispatch:       # Permite lanzamiento manual
 
 jobs:
@@ -10,15 +10,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Set Auth0 & YPF vars
+      - name: Set Auth0 & YPF vars
         run: |
-    echo "LOCATION_CLIENT_ID=${{ secrets.LOCATION_CLIENT_ID }}" >> $GITHUB_ENV
-    echo "LOCATION_CLIENT_SECRET=${{ secrets.LOCATION_CLIENT_SECRET }}" >> $GITHUB_ENV
-    echo "LOCATION_AUDIENCE=${{ secrets.LOCATION_AUDIENCE }}" >> $GITHUB_ENV
-    echo "YPF_CLIENT_ID=${{ secrets.YPF_CLIENT_ID }}" >> $GITHUB_ENV
-    echo "YPF_CLIENT_SECRET=${{ secrets.YPF_CLIENT_SECRET }}" >> $GITHUB_ENV
+          echo "LOCATION_CLIENT_ID=${{ secrets.LOCATION_CLIENT_ID }}"     >> $GITHUB_ENV
+          echo "LOCATION_CLIENT_SECRET=${{ secrets.LOCATION_CLIENT_SECRET }}" >> $GITHUB_ENV
+          echo "LOCATION_AUDIENCE=${{ secrets.LOCATION_AUDIENCE }}"       >> $GITHUB_ENV
+          echo "YPF_CLIENT_ID=${{ secrets.YPF_CLIENT_ID }}"               >> $GITHUB_ENV
+          echo "YPF_CLIENT_SECRET=${{ secrets.YPF_CLIENT_SECRET }}"       >> $GITHUB_ENV
 
-      - uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
       - name: Instalar Newman y CSV reporter
         run: |
