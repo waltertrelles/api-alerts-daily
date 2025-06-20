@@ -10,6 +10,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Set Auth0 & YPF vars
+        run: |
+    echo "LOCATION_CLIENT_ID=${{ secrets.LOCATION_CLIENT_ID }}" >> $GITHUB_ENV
+    echo "LOCATION_CLIENT_SECRET=${{ secrets.LOCATION_CLIENT_SECRET }}" >> $GITHUB_ENV
+    echo "LOCATION_AUDIENCE=${{ secrets.LOCATION_AUDIENCE }}" >> $GITHUB_ENV
+    echo "YPF_CLIENT_ID=${{ secrets.YPF_CLIENT_ID }}" >> $GITHUB_ENV
+    echo "YPF_CLIENT_SECRET=${{ secrets.YPF_CLIENT_SECRET }}" >> $GITHUB_ENV
+
       - uses: actions/checkout@v3
 
       - name: Instalar Newman y CSV reporter
@@ -20,7 +28,7 @@ jobs:
         run: |
           newman run "Generar Tokens.postman_collection.json" \
             -e "YPF-LW PROD.postman_environment.json" \
-            -r cli,csv \
+            --reporters cli,csv \
             --reporter-csv-export resultados.csv
 
       - name: Subir resultados como artefacto
