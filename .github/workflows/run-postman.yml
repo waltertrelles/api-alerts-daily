@@ -22,8 +22,8 @@ jobs:
             --env-var client_secret=${{ secrets.LOCATION_CLIENT_SECRET }} \
             --env-var audience=${{ secrets.LOCATION_AUDIENCE }} \
             -r cli,csv \
-            --reporter-csv-export resultados.csv \
-            --suppress-exit-code
+            --reporter-csv-export resultados.csv || true
+
       - name: Subir resultados como artefacto
         uses: actions/upload-artifact@v4
         with:
