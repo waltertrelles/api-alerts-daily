@@ -329,21 +329,31 @@
 				},
 				"method": "GET",
 				"header": [],
-				"url": "url": {
+				"url": {
   "raw": "https://{{base_url}}/v1/fleet/ypfruta/users/{{userId}}/devices/{{deviceId}}/alerts?from={{dateFrom}}&to={{dateTo}}&page=0&pageSize=100",
   "protocol": "https",
-  "host": ["{{base_url}}"],
+  "host": [
+    "{{base_url}}"
+  ],
   "path": [
-    "v1", "fleet", "ypfruta", "users", "{{userId}}",
-    "devices", "{{deviceId}}", "alerts"
+    "v1",
+    "fleet",
+    "ypfruta",
+    "users",
+    "{{userId}}",
+    "devices",
+    "{{deviceId}}",
+    "alerts"
   ],
   "query": [
     { "key": "from",     "value": "{{dateFrom}}" },
     { "key": "to",       "value": "{{dateTo}}" },
-    { "key": "page",     "value": "0" },
-    { "key": "pageSize", "value": "100" }
+    { "key": "page",     "value": "0"           },
+    { "key": "pageSize", "value": "100"         }
   ]
 }
+
+
 
 					]
 				}
@@ -373,7 +383,7 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"url": "url": {
+				"url":  {
   "raw": "https://{{base_url}}/v1/ping",
   "protocol": "https",
   "host": ["{{base_url}}"],
