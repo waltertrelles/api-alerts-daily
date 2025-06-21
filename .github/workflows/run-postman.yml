@@ -2,8 +2,8 @@ name: Ejecutar colección Postman
 
 on:
   schedule:
-    - cron: '08 8 * * *'      # Todos los días 08:08 UTC
-  workflow_dispatch:          # Permite lanzarlo manualmente
+    - cron: '08 8 * * *'          # Todos los días 08:08 UTC
+  workflow_dispatch:              # Permite lanzarlo manualmente
 
 jobs:
   run:
@@ -12,15 +12,15 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Instalar y ejecutar Newman
-          ls -l "Generar Tokens.postman_collection.json" || echo "Colección no encontrada"
-          ls -l "YPF-LW PROD.postman_environment.json"   || echo "Ambiente no encontrado"
-
         run: |
           npm install -g newman newman-reporter-csv
           which newman
           newman --version
           newman -h | grep csv
-          ls -la
+          echo '----- Verificando archivos -----'
+          ls -l "Generar Tokens.postman_collection.json" || echo "Colección no encontrada"
+          ls -l "YPF-LW PROD.postman_environment.json"   || echo "Ambiente no encontrado"
+          echo '--------------------------------'
           newman run "Generar Tokens.postman_collection.json" \
             -e "YPF-LW PROD.postman_environment.json" \
             --env-var client_id=${{ secrets.LOCATION_CLIENT_ID }} \
@@ -29,16 +29,9 @@ jobs:
             -r cli,csv \
             --reporter-csv-export resultados.csv || true
 
-
-
-
-
       - name: Subir resultados como artefacto
         uses: actions/upload-artifact@v4
         with:
           name: resultados-postman
           path: resultados.csv
-
-
-
 
