@@ -271,87 +271,70 @@
 			"response": []
 		},
 		{
-			"name": "Get Device Alerts",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"const alerts = pm.response.json();\r",
-							"console.log(`Device ${pm.collectionVariables.get('deviceId')} → ${alerts.length} alerts`);\r",
-							"if (pm.collectionVariables.has('devicesList')) {\r",
-							"  postman.setNextRequest('Get Device Alerts');\r",
-							"}"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				},
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"// Listado e índice actual\r",
-							"const devices = JSON.parse(pm.collectionVariables.get('devicesList') || '[]');\r",
-							"let idx       = Number(pm.collectionVariables.get('deviceIdx'));\r",
-							"\r",
-							"// Si ya estábamos en el último, salgo y detengo todo\r",
-							"if (idx >= devices.length - 1) {\r",
-							"  pm.collectionVariables.unset('devicesList');\r",
-							"  pm.collectionVariables.unset('deviceIdx');\r",
-							"  postman.setNextRequest(null);\r",
-							"  return;    // <- impide que se ejecute el GET final\r",
-							"}\r",
-							"\r",
-							"// Si no, incremento y seteo el deviceId\r",
-							"idx++;\r",
-							"const dev = devices[idx];\r",
-							"pm.collectionVariables.set('deviceId', dev.id || dev.deviceId);\r",
-							"pm.collectionVariables.set('deviceIdx', idx);\r",
-							"\r",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{token24h}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-  "raw": "https://{{base_url}}/v1/fleet/ypfruta/users/{{userId}}/devices/{{deviceId}}/alerts?from={{dateFrom}}&to={{dateTo}}&page=0&pageSize=100",
-  "protocol": "https",
-  "host": [
-    "{{base_url}}"
+  "name": "Get Device Alerts",
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "const resp  = pm.response.json();",
+          "const total = resp.records || (resp.content ? resp.content.length : 0);",
+          "console.log(`Device ${pm.collectionVariables.get('deviceId')} → ${total} alerts`);",
+          "if (pm.collectionVariables.has('devicesList')) {",
+          "  pm.execution.setNextRequest('Get Device Alerts');",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "const list = JSON.parse(pm.collectionVariables.get('devicesList') || '[]');",
+          "let idx    = Number(pm.collectionVariables.get('deviceIdx'));",
+          "if (idx >= list.length - 1) {",
+          "  pm.collectionVariables.unset('devicesList');",
+          "  pm.collectionVariables.unset('deviceIdx');",
+          "  pm.execution.setNextRequest(null);",
+          "  return;",
+          "}",
+          "idx++;",
+          "pm.collectionVariables.set('deviceIdx', idx);",
+          "pm.collectionVariables.set('deviceId', list[idx].id || list[idx].deviceId);"
+        ]
+      }
+    }
   ],
-  "path": [
-    "v1",
-    "fleet",
-    "ypfruta",
-    "users",
-    "{{userId}}",
-    "devices",
-    "{{deviceId}}",
-    "alerts"
-  ],
-  "query": [
-    { "key": "from",     "value": "{{dateFrom}}" },
-    { "key": "to",       "value": "{{dateTo}}" },
-    { "key": "page",     "value": "0"           },
-    { "key": "pageSize", "value": "100"         }
-  ]
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "bearer": [
+        { "key": "token", "value": "{{token24h}}", "type": "string" }
+      ]
+    },
+    "method": "GET",
+    "header": [],
+    "url": {
+      "raw": "https://{{base_url}}/v1/fleet/ypfruta/users/{{userId}}/devices/{{deviceId}}/alerts?from={{dateFrom}}&to={{dateTo}}&page=0&pageSize=100",
+      "protocol": "https",
+      "host": ["{{base_url}}"],
+      "path": [
+        "v1","fleet","ypfruta","users","{{userId}}",
+        "devices","{{deviceId}}","alerts"
+      ],
+      "query": [
+        { "key": "from",     "value": "{{dateFrom}}" },
+        { "key": "to",       "value": "{{dateTo}}"   },
+        { "key": "page",     "value": "0"            },
+        { "key": "pageSize", "value": "100"          }
+      ]
+    }
+  },
+  "response": []
 }
+
 
 
 
@@ -361,37 +344,35 @@
 			"response": []
 		},
 		{
-			"name": "New Request",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"const exp = parseInt(pm.collectionVariables.get('deviceCount'), 10);\r",
-							"const got = parseInt(pm.collectionVariables.get('alertsFetched'), 10);\r",
-							"\r",
-							"pm.test(`Se llamaron a alertas de ${exp} dispositivos`, () => {\r",
-							"  pm.expect(got, 'número de GET /alerts').to.eql(exp);\r",
-							"});\r",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url":  {
-  "raw": "https://{{base_url}}/v1/ping",
-  "protocol": "https",
-  "host": ["{{base_url}}"],
-  "path": ["v1", "ping"]
+  "name": "New Request",
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "const exp = parseInt(pm.collectionVariables.get('deviceCount'), 10);",
+          "const got = parseInt(pm.collectionVariables.get('alertsFetched'), 10);",
+          "pm.test(`Se llamaron a alertas de ${exp} dispositivos`, () => {",
+          "  pm.expect(got, 'número de GET /alerts').to.eql(exp);",
+          "});"
+        ]
+      }
+    }
+  ],
+  "request": {
+    "method": "GET",
+    "header": [],
+    "url": {
+      "raw": "https://{{base_url}}/v1/ping",
+      "protocol": "https",
+      "host": ["{{base_url}}"],
+      "path": ["v1","ping"]
+    }
+  },
+  "response": []
 }
 
-			},
-			"response": []
 		}
 	],
 	"event": [
