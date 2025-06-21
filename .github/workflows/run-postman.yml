@@ -12,6 +12,9 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Instalar y ejecutar Newman
+          ls -l "Generar Tokens.postman_collection.json" || echo "Colección no encontrada"
+          ls -l "YPF-LW PROD.postman_environment.json"   || echo "Ambiente no encontrado"
+
         run: |
           npm install -g newman newman-reporter-csv
           which newman
