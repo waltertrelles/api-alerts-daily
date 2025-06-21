@@ -12,17 +12,25 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Instalar Newman y reporter CSV
-        run: npm install -g newman newman-reporter-csv
+        run: |
+          npm install -g newman newman-reporter-csv
 
       - name: Ejecutar colección y exportar CSV
         run: |
-          newman run Generar Tokens.postman_collection.json \
-            -e YPF-LW PROD.postman_environment.json \
+          newman run "Generar Tokens.postman_collection.json" \
+            -e "YPF-LW PROD.postman_environment.json" \
             --env-var client_id=${{ secrets.LOCATION_CLIENT_ID }} \
             --env-var client_secret=${{ secrets.LOCATION_CLIENT_SECRET }} \
             --env-var audience=${{ secrets.LOCATION_AUDIENCE }} \
             --reporters cli,csv \
             --reporter-csv-export resultados.csv
+
+      - name: Subir resultados como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: resultados-postman
+          path: resultados.csv
+
 
       - name: Subir resultados como artefacto
         uses: actions/upload-artifact@v4
