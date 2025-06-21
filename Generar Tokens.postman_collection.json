@@ -255,19 +255,18 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}/v1/fleet/ypfruta/users/{{userId}}/devices",
-					"host": [
-						"{{base_url}}"
-					],
-					"path": [
-						"v1",
-						"fleet",
-						"ypfruta",
-						"users",
-						"{{userId}}",
-						"devices"
-					]
-				}
+  "raw": "https://{{base_url}}/v1/fleet/ypfruta/users/{{userId}}/devices",
+  "protocol": "https",
+  "host": ["{{base_url}}"],
+  "path": [
+    "v1",
+    "fleet",
+    "ypfruta",
+    "users",
+    "{{userId}}",
+    "devices"
+  ]
+}
 			},
 			"response": []
 		},
