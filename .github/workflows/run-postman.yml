@@ -16,14 +16,14 @@ jobs:
           npm install -g newman newman-reporter-csv
           which newman
           newman --version
+          newman -h | grep csv
           newman run "Generar Tokens.postman_collection.json" -e "YPF-LW PROD.postman_environment.json" \
             --env-var client_id=${{ secrets.LOCATION_CLIENT_ID }} \
             --env-var client_secret=${{ secrets.LOCATION_CLIENT_SECRET }} \
             --env-var audience=${{ secrets.LOCATION_AUDIENCE }} \
-            --reporters cli,csv \
+            -r cli,csv \
             --reporter-csv-export resultados.csv \
             --suppress-exit-code
-
       - name: Subir resultados como artefacto
         uses: actions/upload-artifact@v4
         with:
