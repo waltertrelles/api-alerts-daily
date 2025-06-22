@@ -1,9 +1,9 @@
 name: Ejecutar colección Postman
 
 on:
-  schedule:
-    - cron: '08 8 * * *'
   workflow_dispatch:
+  schedule:
+    - cron: '08 8 * * *'      # 08:08 UTC cada día
 
 jobs:
   run:
@@ -13,30 +13,17 @@ jobs:
 
       - name: Instalar y ejecutar Newman
         run: |
-          npm install -g newman newman-reporter-csv
+          npm install -g newman@6 newman-reporter-csv@1
           which newman
           newman --version
-          newman -h | grep csv          # confirma que el reporter aparece
-          echo '--- verificando archivos ---'
-          ls -l "Generar Tokens.postman_collection.json" || echo "Colección NO encontrada"
-          ls -l "YPF-LW PROD.postman_environment.json"   || echo "Ambiente NO encontrado"
-          echo '-----------------------------'
           mkdir -p reports
-          newman run "Generar Tokens.postman_collection.json" \
-            -e "YPF-LW PROD.postman_environment.json" \
-            --env-var client_id=${{ secrets.LOCATION_CLIENT_ID }} \
-            --env-var client_secret=${{ secrets.LOCATION_CLIENT_SECRET }} \
-            --env-var audience=${{ secrets.LOCATION_AUDIENCE }} \
-            -r cli,csv \
-            --reporter-csv-export reports/resultados.csv || true
+          newman run "Generar Tokens.postman_collection.json" -e "YPF-LW PROD.postman_environment.json" --env-var client_id=${{ secrets.LOCATION_CLIENT_ID }} --env-var client_secret=${{ secrets.LOCATION_CLIENT_SECRET }} --env-var audience=${{ secrets.LOCATION_AUDIENCE }} -r cli,csv --reporter-csv-export reports/resultados.csv || true
 
-      # NUEVO ── Muestra dónde quedó cualquier CSV
-      - name: Localizar CSV generado
+      - name: Buscar CSV generado          # ← aparecerá a la izquierda
         run: |
-          echo '--- .csv encontrados ---'
-          find . -maxdepth 3 -name '*.csv' -print
+          echo '--- CSV encontrados ---'
+          find reports -type f -name '*.csv' -print
 
-      # NUEVO ── Sube todo lo que haya dentro de reports/
       - name: Subir resultados como artefacto
         uses: actions/upload-artifact@v4
         with:
