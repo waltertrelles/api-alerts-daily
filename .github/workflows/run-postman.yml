@@ -16,6 +16,7 @@ jobs:
           npm install -g newman newman-reporter-csv
           which newman
           newman --version
+          newman -h | grep csv          # confirma que el reporter aparece
           echo '--- verificando archivos ---'
           ls -l "Generar Tokens.postman_collection.json" || echo "Colección NO encontrada"
           ls -l "YPF-LW PROD.postman_environment.json"   || echo "Ambiente NO encontrado"
@@ -29,8 +30,15 @@ jobs:
             -r cli,csv \
             --reporter-csv-export reports/resultados.csv || true
 
+      # NUEVO ── Muestra dónde quedó cualquier CSV
+      - name: Localizar CSV generado
+        run: |
+          echo '--- .csv encontrados ---'
+          find . -maxdepth 3 -name '*.csv' -print
+
+      # NUEVO ── Sube todo lo que haya dentro de reports/
       - name: Subir resultados como artefacto
         uses: actions/upload-artifact@v4
         with:
           name: resultados-postman
-          path: reports/resultados.csv
+          path: reports/*.csv
