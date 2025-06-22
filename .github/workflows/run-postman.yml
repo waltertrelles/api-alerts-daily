@@ -10,22 +10,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
       - name: Instalar y ejecutar Newman
         run: |
           npm install -g newman@6 newman-reporter-csv@1
           which newman
           newman --version
-          mkdir -p reports
-          newman run "Generar Tokens.postman_collection.json" -e "YPF-LW PROD.postman_environment.json" --env-var client_id=${{ secrets.LOCATION_CLIENT_ID }} --env-var client_secret=${{ secrets.LOCATION_CLIENT_SECRET }} --env-var audience=${{ secrets.LOCATION_AUDIENCE }} -r cli,csv --reporter-csv-export reports/resultados.csv || true
+          newman -h | grep csv                 # <-- debe mostrar “csv”
+          mkdir -p reports                     # carpeta donde esperamos el CSV
+          newman run "Generar Tokens.postman_collection.json" \
+            -e "YPF-LW PROD.postman_environment.json" \
+            --env-var client_id=${{ secrets.LOCATION_CLIENT_ID }} \
+            --env-var client_secret=${{ secrets.LOCATION_CLIENT_SECRET }} \
+            --env-var audience=${{ secrets.LOCATION_AUDIENCE }} \
+            -r cli,csv \
+            --reporter-csv-export reports/resultados.csv || true
 
-      - name: Buscar CSV generado          # ← aparecerá a la izquierda
+      - name: Ver qué escribió Newman          # << nuevo, SOLO diagnostica
         run: |
-          echo '--- CSV encontrados ---'
-          find reports -type f -name '*.csv' -print
+          echo '--- Archivos CSV presentes ---'
+          find . -name '*.csv' -maxdepth 3 -print
 
       - name: Subir resultados como artefacto
         uses: actions/upload-artifact@v4
         with:
           name: resultados-postman
-          path: reports/*.csv
+          path: reports/resultados.csv
