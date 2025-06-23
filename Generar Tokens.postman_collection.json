@@ -1,445 +1,479 @@
 {
-    "info": {
-        "_postman_id": "1f118b16-a008-4353-b557-110f33d0a94e",
-        "name": "Generar Tokens",
-        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-        "_exporter_id": "45741556"
-    },
-    "item": [
-        {
-            "name": "LOCATION 24",
-            "event": [
-                {
-                    "listen": "test",
-                    "script": {
-                        "exec": [
-                            "const res = pm.response.json();",
-                            "pm.environment.set(\"token24h\", res.access_token);"
-                        ],
-                        "type": "text/javascript",
-                        "packages": {}
-                    }
-                }
-            ],
-            "request": {
-                "method": "POST",
-                "header": [
-                    {
-                        "key": "Content-Type",
-                        "value": "application/json"
-                    }
-                ],
-                "body": {
-                    "mode": "raw",
-                    "raw": "{\n    \"client_id\": \"{{client_id}}\",\n    \"client_secret\": \"{{client_secret}}\",\n    \"audience\": \"{{audience}}\",\n    \"grant_type\": \"client_credentials\"\n}"
-                },
-                "url": {
-                    "raw": "https://location-world.auth0.com/oauth/token",
-                    "protocol": "https",
-                    "host": [
-                        "location-world",
-                        "auth0",
-                        "com"
-                    ],
-                    "path": [
-                        "oauth",
-                        "token"
-                    ]
-                }
-            },
-            "response": []
-        },
-        {
-            "name": "YPF 1",
-            "event": [
-                {
-                    "listen": "test",
-                    "script": {
-                        "exec": [
-                            "const res = pm.response.json();\r",
-                            "pm.environment.set(\"token1h\", res.access_token);"
-                        ],
-                        "type": "text/javascript",
-                        "packages": {}
-                    }
-                }
-            ],
-            "request": {
-                "auth": {
-                    "type": "noauth"
-                },
-                "method": "POST",
-                "header": [],
-                "body": {
-                    "mode": "urlencoded",
-                    "urlencoded": [
-                        {
-                            "key": "grant_type",
-                            "value": "password",
-                            "type": "text"
-                        },
-                        {
-                            "key": "client_id",
-                            "value": "57850650-fef2-43dd-9863-df2b235a1de6",
-                            "type": "text"
-                        },
-                        {
-                            "key": "client_secret",
-                            "value": "4150e897-3e68-4b67-bc42-8e0f44da2be4",
-                            "type": "text"
-                        },
-                        {
-                            "key": "scope",
-                            "value": "oob jwt profile proveedor customer",
-                            "type": "text"
-                        },
-                        {
-                            "key": "username",
-                            "value": "hector.petroski@crucerodelnorte.com.ar",
-                            "type": "text"
-                        },
-                        {
-                            "key": "password",
-                            "value": "Crucero31",
-                            "type": "text"
-                        }
-                    ]
-                },
-                "url": {
-                    "raw": "https://mag.ypf.com/auth/oauth/v2/token",
-                    "protocol": "https",
-                    "host": [
-                        "mag",
-                        "ypf",
-                        "com"
-                    ],
-                    "path": [
-                        "auth",
-                        "oauth",
-                        "v2",
-                        "token"
-                    ]
-                }
-            },
-            "response": []
-        },
-        {
-            "name": "Credenciales",
-            "event": [
-                {
-                    "listen": "test",
-                    "script": {
-                        "exec": [
-                            "const json = pm.response.json();\r",
-                            "\r",
-                            "// Guarda userId con el nombre que uses en tu Environment\r",
-                            "pm.environment.set(\"userId\", json.userId);"
-                        ],
-                        "type": "text/javascript",
-                        "packages": {}
-                    }
-                },
-                {
-                    "listen": "prerequest",
-                    "script": {
-                        "exec": [
-                            ""
-                        ],
-                        "type": "text/javascript",
-                        "packages": {}
-                    }
-                }
-            ],
-            "request": {
-                "auth": {
-                    "type": "bearer",
-                    "bearer": [
-                        {
-                            "key": "token",
-                            "value": "{{token24h}}",
-                            "type": "string"
-                        }
-                    ]
-                },
-                "method": "POST",
-                "header": [
-                    {
-                        "key": "Content-Type",
-                        "value": "application/json",
-                        "type": "text"
-                    }
-                ],
-                "body": {
-                    "mode": "raw",
-                    "raw": "{\r\n  \"thirdPartyAccessToken\": \"{{token1h}}\",\r\n  \"username\": \"hector.petroski@crucerodelnorte.com.ar\"\r\n}",
-                    "options": {
-                        "raw": {
-                            "language": "json"
-                        }
-                    }
-                },
-                "url": {
-                    "raw": "https://customer-api.location-world.com/v1/fleet/ypfruta/sessions/3party-jwt",
-                    "protocol": "https",
-                    "host": [
-                        "customer-api",
-                        "location-world",
-                        "com"
-                    ],
-                    "path": [
-                        "v1",
-                        "fleet",
-                        "ypfruta",
-                        "sessions",
-                        "3party-jwt"
-                    ]
-                }
-            },
-            "response": []
-        },
-        {
-            "name": "Get Devices",
-            "event": [
-                {
-                    "listen": "test",
-                    "script": {
-                        "exec": [
-                            "// 1) Extraigo sólo el array de dispositivos\r",
-                            "const resp     = pm.response.json();\r",
-                            "const devices  = resp.content || [];\r",
-                            "\r",
-                            "// 2) Guardo ese array y el índice inicial\r",
-                            "pm.collectionVariables.set('devicesList', JSON.stringify(devices));\r",
-                            "pm.collectionVariables.set('deviceIdx', '-1');\r",
-                            "\r",
-                            "// 3) Guardo el total de dispositivos y reseteo contador de alertas\r",
-                            "pm.collectionVariables.set('deviceCount', devices.length);\r",
-                            "pm.collectionVariables.set('alertsFetched', '0');\r",
-                            ""
-                        ],
-                        "type": "text/javascript",
-                        "packages": {}
-                    }
-                },
-                {
-                    "listen": "prerequest",
-                    "script": {
-                        "packages": {},
-                        "type": "text/javascript"
-                    }
-                }
-            ],
-            "protocolProfileBehavior": {
-                "disableBodyPruning": true
-            },
-            "request": {
-                "auth": {
-                    "type": "bearer",
-                    "bearer": [
-                        {
-                            "key": "token",
-                            "value": "{{token24h}}",
-                            "type": "string"
-                        }
-                    ]
-                },
-                "method": "GET",
-                "header": [],
-                "body": {
-                    "mode": "raw",
-                    "raw": "",
-                    "options": {
-                        "raw": {
-                            "language": "json"
-                        }
-                    }
-                },
-                "url": {
-                    "raw": "https://{{base_url}}/v1/fleet/ypfruta/users/{{userId}}/devices",
-                    "protocol": "https",
-                    "host": [
-                        "{{base_url}}"
-                    ],
-                    "path": [
-                        "v1",
-                        "fleet",
-                        "ypfruta",
-                        "users",
-                        "{{userId}}",
-                        "devices"
-                    ]
-                }
-            },
-            "response": []
-        },
-        {
-            "name": "Get Device Alerts",
-            "event": [
-                {
-                    "listen": "test",
-                    "script": {
-                        "type": "text/javascript",
-                        "exec": [
-                            "const resp  = pm.response.json();",
-                            "const total = resp.records || (resp.content ? resp.content.length : 0);",
-                            "console.log(`Device ${pm.collectionVariables.get('deviceId')} → ${total} alerts`);",
-                            "if (pm.collectionVariables.has('devicesList')) {",
-                            "  pm.execution.setNextRequest('Get Device Alerts');",
-                            "}"
-                        ]
-                    }
-                },
-                {
-                    "listen": "prerequest",
-                    "script": {
-                        "type": "text/javascript",
-                        "exec": [
-                            "const list = JSON.parse(pm.collectionVariables.get('devicesList') || '[]');",
-                            "let idx    = Number(pm.collectionVariables.get('deviceIdx'));",
-                            "if (idx >= list.length - 1) {",
-                            "  pm.collectionVariables.unset('devicesList');",
-                            "  pm.collectionVariables.unset('deviceIdx');",
-                            "  pm.execution.setNextRequest(null);",
-                            "  return;",
-                            "}",
-                            "idx++;",
-                            "pm.collectionVariables.set('deviceIdx', idx);",
-                            "pm.collectionVariables.set('deviceId', list[idx].id || list[idx].deviceId);"
-                        ]
-                    }
-                }
-            ],
-            "request": {
-                "auth": {
-                    "type": "bearer",
-                    "bearer": [
-                        {
-                            "key": "token",
-                            "value": "{{token24h}}",
-                            "type": "string"
-                        }
-                    ]
-                },
-                "method": "GET",
-                "header": [],
-                "url": {
-                    "raw": "https://{{base_url}}/v1/fleet/ypfruta/users/{{userId}}/devices/{{deviceId}}/alerts?from={{dateFrom}}&to={{dateTo}}&page=0&pageSize=100",
-                    "protocol": "https",
-                    "host": [
-                        "{{base_url}}"
-                    ],
-                    "path": [
-                        "v1",
-                        "fleet",
-                        "ypfruta",
-                        "users",
-                        "{{userId}}",
-                        "devices",
-                        "{{deviceId}}",
-                        "alerts"
-                    ],
-                    "query": [
-                        {
-                            "key": "from",
-                            "value": "{{dateFrom}}"
-                        },
-                        {
-                            "key": "to",
-                            "value": "{{dateTo}}"
-                        },
-                        {
-                            "key": "page",
-                            "value": "0"
-                        },
-                        {
-                            "key": "pageSize",
-                            "value": "100"
-                        }
-                    ]
-                }
-            },
-            "response": []
-        },
-        {
-            "name": "New Request",
-            "event": [
-                {
-                    "listen": "test",
-                    "script": {
-                        "type": "text/javascript",
-                        "exec": [
-                            "const exp = parseInt(pm.collectionVariables.get('deviceCount'), 10);",
-                            "const got = parseInt(pm.collectionVariables.get('alertsFetched'), 10);",
-                            "pm.test(`Se llamaron a alertas de ${exp} dispositivos`, () => {",
-                            "  pm.expect(got, 'número de GET /alerts').to.eql(exp);",
-                            "});"
-                        ]
-                    }
-                }
-            ],
-            "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                    "raw": "https://{{base_url}}/v1/ping",
-                    "protocol": "https",
-                    "host": [
-                        "{{base_url}}"
-                    ],
-                    "path": [
-                        "v1",
-                        "ping"
-                    ]
-                }
-            },
-            "response": []
-        }
-    ],
-    "event": [
-        {
-            "listen": "prerequest",
-            "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                    "// Calcula “ayer” UTC y lo guarda en dateFrom/dateTo\r",
-                    "const now       = new Date();\r",
-                    "const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);\r",
-                    "const pad       = n => n.toString().padStart(2,'0');\r",
-                    "const isoDate   = d => \r",
-                    "  d.getUTCFullYear() + '-' +\r",
-                    "  pad(d.getUTCMonth()+1) + '-' +\r",
-                    "  pad(d.getUTCDate());\r",
-                    "\r",
-                    "pm.environment.set('dateFrom', isoDate(yesterday) + 'T00:00:00Z');\r",
-                    "pm.environment.set('dateTo',   isoDate(yesterday) + 'T23:59:59Z');\r",
-                    ""
-                ]
-            }
-        },
-        {
-            "listen": "test",
-            "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                    ""
-                ]
-            }
-        }
-    ],
-    "variable": [
-        {
-            "key": "deviceId",
-            "value": ""
-        },
-        {
-            "key": "deviceCount",
-            "value": ""
-        },
-        {
-            "key": "alertsFetched",
-            "value": ""
-        }
-    ]
+	"info": {
+		"_postman_id": "1f118b16-a008-4353-b557-110f33d0a94e",
+		"name": "Generar Tokens",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "45741556"
+	},
+	"item": [
+		{
+			"name": "LOCATION 24",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const res = pm.response.json();",
+							"pm.environment.set(\"token24h\", res.access_token);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"client_id\": \"{{client_id}}\",\n    \"client_secret\": \"{{client_secret}}\",\n    \"audience\": \"{{audience}}\",\n    \"grant_type\": \"client_credentials\"\n}"
+				},
+				"url": {
+					"raw": "https://location-world.auth0.com/oauth/token",
+					"protocol": "https",
+					"host": [
+						"location-world",
+						"auth0",
+						"com"
+					],
+					"path": [
+						"oauth",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "YPF 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const res = pm.response.json();\r",
+							"pm.environment.set(\"token1h\", res.access_token);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "57850650-fef2-43dd-9863-df2b235a1de6",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "4150e897-3e68-4b67-bc42-8e0f44da2be4",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "oob jwt profile proveedor customer",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "hector.petroski@crucerodelnorte.com.ar",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "Crucero31",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://mag.ypf.com/auth/oauth/v2/token",
+					"protocol": "https",
+					"host": [
+						"mag",
+						"ypf",
+						"com"
+					],
+					"path": [
+						"auth",
+						"oauth",
+						"v2",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Credenciales",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const json = pm.response.json();\r",
+							"\r",
+							"// Guarda userId con el nombre que uses en tu Environment\r",
+							"pm.environment.set(\"userId\", json.userId);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token24h}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"thirdPartyAccessToken\": \"{{token1h}}\",\r\n  \"username\": \"hector.petroski@crucerodelnorte.com.ar\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://customer-api.location-world.com/v1/fleet/ypfruta/sessions/3party-jwt",
+					"protocol": "https",
+					"host": [
+						"customer-api",
+						"location-world",
+						"com"
+					],
+					"path": [
+						"v1",
+						"fleet",
+						"ypfruta",
+						"sessions",
+						"3party-jwt"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Devices",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// 1) Extraigo sólo el array de dispositivos\r",
+							"const resp     = pm.response.json();\r",
+							"const devices  = resp.content || [];\r",
+							"\r",
+							"// 2) Guardo ese array y el índice inicial\r",
+							"pm.collectionVariables.set('devicesList', JSON.stringify(devices));\r",
+							"pm.collectionVariables.set('deviceIdx', '-1');\r",
+							"\r",
+							"// 3) Guardo el total de dispositivos y reseteo contador de alertas\r",
+							"pm.collectionVariables.set('deviceCount', devices.length);\r",
+							"pm.collectionVariables.set('alertsFetched', '0');\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"packages": {},
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token24h}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/v1/fleet/ypfruta/users/{{userId}}/devices",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"fleet",
+						"ypfruta",
+						"users",
+						"{{userId}}",
+						"devices"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Device Alerts",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const devices = JSON.parse(pm.collectionVariables.get('devicesList') || '[]');\r",
+							"let idx       = Number(pm.collectionVariables.get('deviceIdx'));\r",
+							"\r",
+							"// Si ya procesé el último, limpio y paro la colección\r",
+							"if (idx >= devices.length - 1) {\r",
+							"  pm.collectionVariables.unset('devicesList');\r",
+							"  pm.collectionVariables.unset('deviceIdx');\r",
+							"  pm.setNextRequest(null);\r",
+							"  return;\r",
+							"}\r",
+							"\r",
+							"// Si no, incremento y me preparo para la próxima alerta\r",
+							"idx++;\r",
+							"const dev = devices[idx];\r",
+							"pm.collectionVariables.set('deviceId', dev.id || dev.deviceId);\r",
+							"pm.collectionVariables.set('deviceIdx', idx);\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"/* ---------- PARÁMETROS DE PAGINACIÓN ---------- */\r",
+							"const pageSize = 50;                                   // máximo permitido\r",
+							"let   page     = +pm.environment.get('page')  || 0;    // página actual (base 0)\r",
+							"\r",
+							"/* ---------- RESPUESTA DEL ENDPOINT ---------- */\r",
+							"const res   = pm.response.json();          // { records, content:[...] }\r",
+							"const items = res.content || [];\r",
+							"\r",
+							"/* ---------- PROCESO TUS ALERTAS (opcional) ---------- */\r",
+							"// Ejemplo: acumular todo en una variable de colección\r",
+							"const buffer = JSON.parse(pm.collectionVariables.get('allAlerts') || '[]');\r",
+							"pm.collectionVariables.set('allAlerts', JSON.stringify(buffer.concat(items)));\r",
+							"\r",
+							"/* ---------- PAGINACIÓN ---------- */\r",
+							"if (items.length === pageSize) {\r",
+							"  // Aún hay más páginas de ESTE dispositivo\r",
+							"  pm.environment.set('page', page + 1);\r",
+							"  pm.setNextRequest(pm.info.requestName);              // repite la misma request\r",
+							"} else {\r",
+							"  // Ya recorrí todas las páginas → paso al siguiente dispositivo\r",
+							"  pm.environment.unset('page');                        // vuelve a 0 automáticamente\r",
+							"  let devices = JSON.parse(pm.collectionVariables.get('devicesList') || '[]');\r",
+							"  devices.shift();                                     // quita el que acabo de procesar\r",
+							"  pm.collectionVariables.set('devicesList', JSON.stringify(devices));\r",
+							"\r",
+							"  if (devices.length) {\r",
+							"    pm.environment.set('deviceId', devices[0]);        // siguiente ID\r",
+							"    pm.setNextRequest('Get Device Alerts');            // vuelve a la request\r",
+							"  } else {\r",
+							"    pm.setNextRequest(null);                           // fin de la colección\r",
+							"  }\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token24h}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/v1/fleet/ypfruta/users/{{userId}}/devices/{{deviceId}}/alerts?from={{dateFrom}}&to={{dateTo}}&page=0&pageSize=100",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"fleet",
+						"ypfruta",
+						"users",
+						"{{userId}}",
+						"devices",
+						"{{deviceId}}",
+						"alerts"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "{{dateFrom}}"
+						},
+						{
+							"key": "to",
+							"value": "{{dateTo}}"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "pageSize",
+							"value": "100"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const exp = parseInt(pm.collectionVariables.get('deviceCount'), 10);\r",
+							"const got = parseInt(pm.collectionVariables.get('alertsFetched'), 10);\r",
+							"\r",
+							"pm.test(`Se llamaron a alertas de ${exp} dispositivos`, () => {\r",
+							"  pm.expect(got, 'número de GET /alerts').to.eql(exp);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "/v1/ping",
+					"path": [
+						"v1",
+						"ping"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"// Calcula “ayer” UTC y lo guarda en dateFrom/dateTo\r",
+					"const now       = new Date();\r",
+					"const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);\r",
+					"const pad       = n => n.toString().padStart(2,'0');\r",
+					"const isoDate   = d => \r",
+					"  d.getUTCFullYear() + '-' +\r",
+					"  pad(d.getUTCMonth()+1) + '-' +\r",
+					"  pad(d.getUTCDate());\r",
+					"\r",
+					"pm.environment.set('dateFrom', isoDate(yesterday) + 'T00:00:00Z');\r",
+					"pm.environment.set('dateTo',   isoDate(yesterday) + 'T23:59:59Z');\r",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "deviceId",
+			"value": ""
+		},
+		{
+			"key": "deviceCount",
+			"value": ""
+		},
+		{
+			"key": "alertsFetched",
+			"value": ""
+		}
+	]
 }
