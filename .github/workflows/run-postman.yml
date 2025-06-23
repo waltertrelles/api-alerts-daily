@@ -1,28 +1,26 @@
 name: Ejecutar colección Postman
 
-# Permisos de escritura para que el bot pueda hacer push
 permissions:
-  contents: write
+  contents: write          # el bot puede hacer push
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '08 8 * * *'   # 08:08 UTC (05:08 ART) todos los días
+    - cron: '08 8 * * *'   # 08:08 UTC (05:08 ART) diario
 
 jobs:
   run:
     runs-on: ubuntu-latest
     steps:
-      # 1) Checkout con historial completo (evita conflictos)
+      # 1) Checkout con todo el historial
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: 0            # necesario para reset
 
-      # 2) Ejecutar Newman y generar CSV
+      # 2) Ejecutar Newman y crear CSV
       - name: Instalar y ejecutar Newman
         run: |
           npm install -g newman@6 newman-reporter-csv@1
-          newman --version
           mkdir -p reports
           newman run "Generar Tokens.postman_collection.json" \
             -e "YPF-LW PROD.postman_environment.json" \
@@ -33,31 +31,27 @@ jobs:
             --reporter-csv-export reports/resultados.csv \
             --suppress-exit-code
 
-      # (opcional) Verificar que el CSV existe
-      - name: Ver qué escribió Newman
-        run: find reports -type f -name '*.csv' -print
-
-      # 3) Subir el CSV como artefacto
-      - name: Subir resultados como artefacto
-        uses: actions/upload-artifact@v4
+      # 3) Subir artefacto (opcional)
+      - uses: actions/upload-artifact@v4
         with:
           name: resultados-postman
           path: reports/resultados.csv
 
-      # 4) Commit + push del CSV al repositorio
+      # 4) Publicar CSV en la rama main
       - name: Publicar CSV en la rama main
         run: |
           git config --global user.email "bot@users.noreply.github.com"
           git config --global user.name  "bot"
 
-          # Traer últimos commits remotos (evita non-fast-forward)
-          git pull --rebase --autostash
+          # ► Paso clave: alinea la rama local con el último estado remoto
+          git fetch origin main
+          git reset --soft origin/main      # base limpia en HEAD remoto
 
-          # Añadir y comitear el CSV
+          # añade/elimina solo si cambió el CSV
           git add reports/resultados.csv
-          git commit -m "bot: CSV diario actualizado" || echo "Sin cambios"
+          git diff --cached --quiet && echo "Sin cambios" && exit 0
 
-          # Empujar a la rama main
-          git push
+          git commit -m "bot: CSV diario $(date +%F)"
+          git push origin HEAD:main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
