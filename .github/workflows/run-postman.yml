@@ -3,22 +3,19 @@ name: Ejecutar colección Postman (CSV completo)
 on:
   workflow_dispatch:
   schedule:
-    - cron: '08 8 * * *'      # 08:08 UTC (05:08 ART) todos los días
+    - cron: '08 8 * * *'    # 08:08 UTC (05:08 ART) diario
 
 jobs:
   run:
     runs-on: ubuntu-latest
     steps:
-      # 1) Clonar el repo (historial mínimo basta porque no haremos push)
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v3           # clon mínimo
 
-      # 2) Instalar Newman y reporter CSV
       - name: Instalar Newman
         run: |
           npm install -g newman@6 newman-reporter-csv@1
           newman --version
 
-      # 3) Ejecutar la colección y exportar un CSV con CUERPOS incluidos
       - name: Ejecutar colección y generar CSV completo
         run: |
           mkdir -p reports
@@ -30,14 +27,10 @@ jobs:
             -r cli,csv \
             --reporter-csv-includeBody \
             --reporter-csv-export reports/resultados-completos.csv \
-            --suppress-exit-code   # nunca corta el flujo por códigos ≠0
+            --suppress-exit-code
 
-      # 4) Subir el CSV completo como artefacto
       - name: Subir artefacto
         uses: actions/upload-artifact@v4
         with:
           name: resultados-completos
           path: reports/resultados-completos.csv
-              git push origin HEAD:main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
