@@ -37,20 +37,20 @@ jobs:
           name: resultados-postman
           path: reports/resultados.csv
 
-      # 4) Publicar CSV en la rama main
       - name: Publicar CSV en la rama main
         run: |
           git config --global user.email "bot@users.noreply.github.com"
           git config --global user.name  "bot"
 
-          # ► Paso clave: alinea la rama local con el último estado remoto
+          # 1️⃣ Trae la punta remota y alinea HEAD ahí
           git fetch origin main
-          git reset --soft origin/main      # base limpia en HEAD remoto
+          git reset --soft origin/main      # <─ sin esto seguirá chocando
 
-          # añade/elimina solo si cambió el CSV
+          # 2️⃣ Añade el CSV solo si cambió
           git add reports/resultados.csv
           git diff --cached --quiet && echo "Sin cambios" && exit 0
 
+          # 3️⃣ Commit y push (ya es fast-forward)
           git commit -m "bot: CSV diario $(date +%F)"
           git push origin HEAD:main
         env:
