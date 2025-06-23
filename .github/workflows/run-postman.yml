@@ -1,9 +1,13 @@
 name: Ejecutar colección Postman
 
+# ── permisos para que GitHub Actions pueda hacer push ────────────────
+permissions:
+  contents: write          # habilita git push con GITHUB_TOKEN
+
 on:
   workflow_dispatch:
   schedule:
-    - cron: '08 8 * * *'      # 08:08 UTC cada día
+    - cron: '08 8 * * *'   # 08:08 UTC (05:08 ART) todos los días
 
 jobs:
   run:
@@ -14,7 +18,6 @@ jobs:
       - name: Instalar y ejecutar Newman
         run: |
           npm install -g newman@6 newman-reporter-csv@1
-          which newman
           newman --version
           mkdir -p reports
           newman run "Generar Tokens.postman_collection.json" \
@@ -37,15 +40,14 @@ jobs:
           name: resultados-postman
           path: reports/resultados.csv
 
-      # ────────────────────────────────────────────────────────────────
-      # Nuevo paso: publica el CSV en la rama main para que Sheets lo lea
+      # ── publica el CSV en la rama para que Sheets lo lea ────────────
       - name: Publicar CSV en la rama main
         run: |
           git config --global user.email "bot@users.noreply.github.com"
           git config --global user.name  "bot"
-          # El archivo ya está en reports/resultados.csv
           git add reports/resultados.csv
           git commit -m "bot: CSV diario actualizado" || echo "Sin cambios"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
