@@ -1,26 +1,26 @@
-name: Ejecutar colección Postman
-
-permissions:
-  contents: write          # el bot puede hacer push
+name: Ejecutar colección Postman (CSV completo)
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '08 8 * * *'   # 08:08 UTC (05:08 ART) diario
+    - cron: '08 8 * * *'      # 08:08 UTC (05:08 ART) todos los días
 
 jobs:
   run:
     runs-on: ubuntu-latest
     steps:
-      # 1) Checkout con todo el historial
+      # 1) Clonar el repo (historial mínimo basta porque no haremos push)
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0            # necesario para reset
 
-      # 2) Ejecutar Newman y crear CSV
-      - name: Instalar y ejecutar Newman
+      # 2) Instalar Newman y reporter CSV
+      - name: Instalar Newman
         run: |
           npm install -g newman@6 newman-reporter-csv@1
+          newman --version
+
+      # 3) Ejecutar la colección y exportar un CSV con CUERPOS incluidos
+      - name: Ejecutar colección y generar CSV completo
+        run: |
           mkdir -p reports
           newman run "Generar Tokens.postman_collection.json" \
             -e "YPF-LW PROD.postman_environment.json" \
@@ -28,30 +28,16 @@ jobs:
             --env-var client_secret=${{ secrets.LOCATION_CLIENT_SECRET }} \
             --env-var audience=${{ secrets.LOCATION_AUDIENCE }} \
             -r cli,csv \
-            --reporter-csv-export reports/resultados.csv \
-            --suppress-exit-code
+            --reporter-csv-includeBody \
+            --reporter-csv-export reports/resultados-completos.csv \
+            --suppress-exit-code   # nunca corta el flujo por códigos ≠0
 
-      # 3) Subir artefacto (opcional)
-      - uses: actions/upload-artifact@v4
+      # 4) Subir el CSV completo como artefacto
+      - name: Subir artefacto
+        uses: actions/upload-artifact@v4
         with:
-          name: resultados-postman
-          path: reports/resultados.csv
-
-      - name: Publicar CSV en la rama main
-        run: |
-          git config --global user.email "bot@users.noreply.github.com"
-          git config --global user.name  "bot"
-
-          # 1️⃣ Trae la punta remota y alinea HEAD ahí
-          git fetch origin main
-          git reset --soft origin/main      # <─ sin esto seguirá chocando
-
-          # 2️⃣ Añade el CSV solo si cambió
-          git add reports/resultados.csv
-          git diff --cached --quiet && echo "Sin cambios" && exit 0
-
-          # 3️⃣ Commit y push (ya es fast-forward)
-          git commit -m "bot: CSV diario $(date +%F)"
-          git push origin HEAD:main
+          name: resultados-completos
+          path: reports/resultados-completos.csv
+              git push origin HEAD:main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
