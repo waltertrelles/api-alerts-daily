@@ -1,8 +1,8 @@
 name: Ejecutar colección Postman
 
-# ── permisos para que GitHub Actions pueda hacer push ────────────────
+#  Permisos de escritura para poder hacer push
 permissions:
-  contents: write          # habilita git push con GITHUB_TOKEN
+  contents: write
 
 on:
   workflow_dispatch:
@@ -13,8 +13,12 @@ jobs:
   run:
     runs-on: ubuntu-latest
     steps:
+      # ── 1. Checkout con historial completo ────────────────────────
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0          # descarga todos los commits
 
+      # ── 2. Ejecutar Newman y generar CSV ──────────────────────────
       - name: Instalar y ejecutar Newman
         run: |
           npm install -g newman@6 newman-reporter-csv@1
@@ -29,25 +33,29 @@ jobs:
             --reporter-csv-export reports/resultados.csv \
             --suppress-exit-code
 
-      - name: Ver qué escribió Newman        # diagnóstico opcional
-        run: |
-          echo '--- Archivos CSV presentes ---'
-          find reports -type f -name '*.csv' -print
+      # (opcional) Diagnóstico rápido
+      - name: Ver qué escribió Newman
+        run: find reports -type f -name '*.csv' -print
 
+      # ── 3. Subir artefacto para descarga manual ────────────────────
       - name: Subir resultados como artefacto
         uses: actions/upload-artifact@v4
         with:
           name: resultados-postman
           path: reports/resultados.csv
 
-      # ── publica el CSV en la rama para que Sheets lo lea ────────────
+      # ── 4. Commit + push del CSV a la rama main ───────────────────
       - name: Publicar CSV en la rama main
         run: |
           git config --global user.email "bot@users.noreply.github.com"
           git config --global user.name  "bot"
+
+          # integra último commit remoto (evita non-fast-forward)
+          git pull --rebase --autostash
+
           git add reports/resultados.csv
           git commit -m "bot: CSV diario actualizado" || echo "Sin cambios"
+
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
