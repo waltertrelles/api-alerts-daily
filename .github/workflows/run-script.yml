@@ -1,0 +1,35 @@
+name: Ejecutar script de alertas
+
+on:
+  schedule:
+    - cron: '8 8 * * *' # todos los días a las 08:08
+  workflow_dispatch:
+
+jobs:
+  ejecutar-script:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Clonar repositorio
+      uses: actions/checkout@v3
+
+    - name: Instalar Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Instalar dependencias
+      run: npm install axios
+
+    - name: Ejecutar script
+      env:
+        LOCATION_CLIENT_ID: ${{ secrets.LOCATION_CLIENT_ID }}
+        LOCATION_CLIENT_SECRET: ${{ secrets.LOCATION_CLIENT_SECRET }}
+        LOCATION_AUDIENCE: ${{ secrets.LOCATION_AUDIENCE }}
+      run: node get-alerts.js
+
+    - name: Guardar CSV como artefacto
+      uses: actions/upload-artifact@v3
+      with:
+        name: resultados-alertas
+        path: resultados-alertas.csv
